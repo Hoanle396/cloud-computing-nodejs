@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style type="text/css">
+    /*=============== GOOGLE FONTS ===============*/
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+
+    /*=============== VARIABLES CSS ===============*/
+    :root {
+      /*========== Colors ==========*/
+      /*Color mode HSL(hue, saturation, lightness)*/
+      --first-color: hsl(222, 80%, 58%);
+      --dark-color: hsl(222, 24%, 8%);
+      --title-color: hsl(222, 8%, 8%);
+      --text-color-light: hsl(222, 8%, 65%);
+      --white-color: #fff;
+      --body-color: hsl(222, 100%, 99%);
+      /*========== Font and typography ==========*/
+      /*.5rem = 8px | 1rem = 16px ...*/
+      --body-font: "Poppins", sans-serif;
+      --small-font-size: .813rem;
+    }
+
+    @media screen and (min-width: 968px) {
+      :root {
+        --small-font-size: .875rem;
+      }
+    }
+
+    /*=============== BASE ===============*/
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+
+    body {
+      background-color: var(--body-color);
+    }
+
+    .search {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      background-color: var(--white-color);
+      box-shadow: 0 4px 24px hsla(222, 68%, 12%, 0.1);
+      border-radius: 4rem;
+      padding: 10px;
+      overflow: hidden;
+      transition: width 0.5s cubic-bezier(0.9, 0, 0.3, 0.9);
+    }
+
+    .search__input {
+      border: none;
+      outline: none;
+      width: calc(100% - 64px);
+      height: 100%;
+      border-radius: 4rem;
+      padding-left: 14px;
+      font-family: var(--body-font);
+      font-size: var(--small-font-size);
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.5s;
+    }
+
+    .search__input:-webkit-autofill {
+      box-shadow: 0 0 0 100px var(--white-color) inset;
+    }
+
+    .search__button {
+      width: 56px;
+      height: 56px;
+      background-color: var(--dark-color);
+      border-radius: 50%;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 10px;
+      margin: auto;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 0.6s cubic-bezier(0.9, 0, 0.3, 0.9);
+    }
+
+    .search__icon,
+    .search__close {
+      color: var(--white-color);
+      font-size: 1.5rem;
+      position: absolute;
+      transition: opacity 0.5s cubic-bezier(0.9, 0, 0.3, 0.9);
+    }
+
+    .search__close {
+      opacity: 0;
+    }
+
+    /* Search animated */
+    .show-search {
+      width: 100%;
+    }
+
+    .show-search .search__input {
+      opacity: 1;
+      pointer-events: initial;
+    }
+
+    .show-search .search__button {
+      transform: rotate(90deg);
+    }
+
+    .show-search .search__icon {
+      opacity: 0;
+    }
+
+    .show-search .search__close {
+      opacity: 1;
+    }
+
+    /*=============== BREAKPOINTS ===============*/
+    /* For medium devices */
+    @media screen and (min-width: 576px) {
+      .show-search {
+        width: 450px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="search">
+    <div class="flex flex-row justify-center items-center w-full my-8">
+      <div class="search" action="#" id="search-bar">
+        <input type="search" placeholder="Type something..." id="search" name="q" class="search__input">
+
+        <div class="search__button" id="search-button">
+          <i class="ri-search-2-line search__icon"></i>
+          <i class="ri-close-line search__close"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="root" class="flex flex-row justify-center gap-4 mx-20 flex-wrap">
+
+  </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+  crossorigin="anonymous"></script>
+<script>
+  const toggleSearch = (search, button) => {
+    const searchBar = document.getElementById(search),
+      searchButton = document.getElementById(button)
+
+    searchButton.addEventListener('click', () => {
+      // We add the show-search class, so that the search bar expands
+      searchBar.classList.toggle('show-search')
+    })
+  }
+  toggleSearch('search-bar', 'search-button')
+
+  $(document).ready(function () {
+    function getProducts(search) {
+      $.ajax({
+        method: 'GET',
+        url: '/get-products',
+        data: {
+          search
+        },
+        success: function (data) {
+          var html = "";
+          data.forEach(function (item) {
+            html += `<div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+              <a href="#">
+                <img class="rounded-lg w-88 aspect-square object-cover p-2" src="${item.image}" alt="" />
+              </a>
+              <div class="p-5">
+                <a href="#">
+                  <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${item.name}</h5>
+                </a>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">${item.description}</p>
+                <a href="#"
+                  class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                  Read more
+                  <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 14 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M1 5h12m0 0L9 1m4 4L9 9" />
+                  </svg>
+                </a>
+              </div>
+            </div>`
+          })
+          $('#root').html(html);
+        },
+        error: function (data) {
+          $('#root').html(`<div className="mx-auto flex min-h-screen items-center justify-center px-6 py-12 bg-[#3D054A]">
+            <div>
+              <p className="text-main text-sm font-medium text-white">Not found</p>
+              <h1 className="mt-3 text-2xl font-semibold md:text-3xl text-white">
+                We can&apos;t find that products
+              </h1>
+              <p className="mt-4 text-gray-400 ">
+                Sorry, the page you are looking for doesn&apos;t exist or has been
+                moved.
+              </p>
+            </div>
+          </div>`);
+        }
+      })
+    }
+
+    $('#search').on('keyup', function (e) {
+      var input = e?.target?.value ?? "";
+      getProducts(input)
+    })
+
+    getProducts()
+  })
+</script>
+
+</html>
